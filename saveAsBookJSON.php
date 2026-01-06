@@ -1,6 +1,6 @@
 <?php
 
-if(isset($_REQUEST['name']) && !empty($_REQUEST['name']) && isset($_REQUEST['chapters']) && !empty($_REQUEST['chapters'])) {
+if(isset($_REQUEST['name']) && !empty($_REQUEST['name'])) {
     $name = $_REQUEST['name'];  
     if(file_put_contents("bookMakerSpeicher/".$name.".json", json_encode($_REQUEST))) {
         $a = array('antwort' => 1);
