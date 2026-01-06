@@ -159,6 +159,9 @@
               <input Placeholder="until" id="until" value="" type="date" v-model="until" v-on:change="getData">
               <label>umgekehrt</label>
               <input Placeholder="Umgekehrt" id="umgekehrt" type="checkbox" v-model="umgekehrt" v-on:change="getData">
+              <label>FileUpload</label>
+              <input Placeholder="FileUpload" id="upload" type="file">
+              <button class="btn btn-primary saveFile" v-on:click="saveJSONFile">Save Facebook-JSON</button> 
               <input Placeholder="Bookname" id="name" type="text" v-model="name">
               <button class="btn btn-primary speichern" v-on:click="saveData">Save</button> 
               <select v-model="bookJson" v-on:change="loadData">
@@ -169,7 +172,7 @@
                           echo '<option value="'.$files[$n].'">'.$files[$n].'</option>'; 
                       } 
                 ?>      
-              </select>
+              </select> 
           </div>
         </div>
         <div class="row">
@@ -211,16 +214,34 @@
             },
             methods: {
               getData: function () {
-				  var textTimesObject = $('.book-container').find('.chapter-element-time');
-				  var times = [];
-				  textTimesObject.each(function(index) {
-					times.push($(this).html());
-				  });				  
-                  fetch(`getFullMorbusJSONs.php?regex=`+this.regex+`&regex2=`+this.regex2+`&contra=`+this.contra+`&from=`+this.from+`&until=`+this.until+`&umgekehrt=`+this.umgekehrt+'&mintextlength='+this.mintextlength+'&maxtextlength='+this.maxtextlength+'&texteeimer='+JSON.stringify(times))
+                  var textTimesObject = $('.book-container').find('.chapter-element-time');
+                  var times = [];
+                  textTimesObject.each(function(index) {
+                  times.push($(this).html());
+                  });				  
+                  fetch(`getFullJSONs.php?regex=`+this.regex+`&regex2=`+this.regex2+`&contra=`+this.contra+`&from=`+this.from+`&until=`+this.until+`&umgekehrt=`+this.umgekehrt+'&mintextlength='+this.mintextlength+'&maxtextlength='+this.maxtextlength+'&texteeimer='+JSON.stringify(times))
                   .then(res => res.json())
                   .then(res => {
                       this.data = res;
                   }); 
+              },
+              saveJSONFile: function () {
+                var file_data = $("#upload").prop("files")[0];   
+                var form_data = new FormData();
+                form_data.append("file", file_data);
+                    $.ajax({
+                      url: 'saveJSON.php', // <-- point to server-side PHP script 
+                      dataType: 'JSON',  // <-- what to expect back from the PHP script, if anything
+                      cache: false,
+                      contentType: false,
+                      processData: false,
+                      data: form_data,                         
+                      type: 'post',
+                      success: function(v){
+                        if(v.antwort !== undefined && v.antwort == 1)  
+                        alert('Uploaded'); // <-- display response from the PHP script, if any
+                      }
+                  });
               },
               saveData: function () {
                   var chapters = $('.book-container').html();
